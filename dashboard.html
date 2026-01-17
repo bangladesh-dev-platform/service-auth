@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="dashboard.profile">Dashboard</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body style="display: block; padding: 0;">
+    <!-- Top Navigation -->
+    <nav class="dashboard-nav">
+        <div class="logo-container" style="margin: 0;">
+            <div class="logo-circle" style="width: 32px; height: 32px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="12" fill="#FFFFFF" />
+                    <circle cx="12" cy="12" r="5" fill="#F42A41" />
+                </svg>
+            </div>
+            <h1 class="logo-text" data-i18n="app.name" style="font-size: 18px;">Bangladesh Digital Auth</h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="lang-switcher">
+                <button class="lang-btn" data-lang="en">EN</button>
+                <span class="lang-divider">|</span>
+                <button class="lang-btn" data-lang="bn">বাং</button>
+            </div>
+            <button id="logout-btn" class="btn btn-primary" style="width: auto; padding: 8px 16px; font-size: 14px;">
+                <span data-i18n="dashboard.logout">Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <!-- Welcome Message -->
+        <h2 id="welcome-text" style="margin-bottom: 32px; font-size: 28px; color: var(--text-primary);">
+            Welcome!
+        </h2>
+
+        <!-- Profile & Settings Grid -->
+        <div class="dashboard-grid">
+            <!-- Profile Card -->
+            <div class="dashboard-card">
+                <h3 data-i18n="dashboard.profile">Profile</h3>
+                <div class="profile-info">
+                    <div class="profile-item">
+                        <span class="profile-label" data-i18n="dashboard.email">Email</span>
+                        <span class="profile-value" id="user-email">-</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label" data-i18n="dashboard.phone">Phone</span>
+                        <span class="profile-value" id="user-phone">-</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label" data-i18n="dashboard.joined">Joined</span>
+                        <span class="profile-value" id="user-joined">-</span>
+                    </div>
+                </div>
+                <button id="edit-profile-btn" class="btn btn-primary" style="margin-top: 16px;">
+                    <span data-i18n="dashboard.edit">Edit Profile</span>
+                </button>
+            </div>
+
+            <!-- Settings Card -->
+            <div class="dashboard-card">
+                <h3 data-i18n="dashboard.settings">Settings</h3>
+                <div class="profile-info">
+                    <div class="profile-item">
+                        <span class="profile-label" data-i18n="dashboard.language">Language</span>
+                        <span class="profile-value" id="current-language">English</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label" data-i18n="dashboard.changePassword">Change Password</span>
+                        <a href="change-password.html" class="link-secondary" style="font-size: 14px;">Change</a>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label" data-i18n="dashboard.sessions">Active Sessions</span>
+                        <span class="profile-value">1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="dashboard-card" style="margin-top: 24px;">
+            <h3 data-i18n="dashboard.activity">Recent Activity</h3>
+            <div id="activity-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+
+    <script>
+        // Update current language display
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const langEl = document.getElementById('current-language');
+                if (langEl) {
+                    langEl.textContent = i18n.currentLanguage === 'bn' ? 'বাংলা' : 'English';
+                }
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>

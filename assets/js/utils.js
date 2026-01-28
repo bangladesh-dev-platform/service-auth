@@ -243,14 +243,42 @@ class UIHelper {
 /**
  * Format date for display
  */
-function formatDate(dateString) {
-    const date = new Date(dateString);
+function formatDate(dateInput) {
+    let date;
+
+    if (!dateInput) {
+        return '-';
+    }
+
+    if (dateInput instanceof Date) {
+        date = dateInput;
+    } else if (typeof dateInput === 'string') {
+        let normalized = dateInput.trim();
+        if (!normalized.includes('T')) {
+            normalized = normalized.replace(' ', 'T');
+        }
+        if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized)) {
+            normalized += 'Z';
+        }
+        date = new Date(normalized);
+    } else {
+        date = new Date(dateInput);
+    }
+
+    if (Number.isNaN(date.getTime())) {
+        return '-';
+    }
+
     const now = new Date();
-    const diff = now - date;
+    const diff = now.getTime() - date.getTime();
 
     // Less than 1 hour
+    if (diff < 60000) {
+        return i18n.currentLanguage === 'bn' ? 'এইমাত্র' : 'just now';
+    }
+
     if (diff < 3600000) {
-        const minutes = Math.floor(diff / 60000);
+        const minutes = Math.max(1, Math.floor(diff / 60000));
         return `${minutes} ${i18n.currentLanguage === 'bn' ? 'মিনিট আগে' : 'minutes ago'}`;
     }
 

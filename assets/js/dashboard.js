@@ -3,6 +3,8 @@
  * Handles user dashboard display and interactions
  */
 
+let dashboardResendBound = false;
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!TokenManager.isLoggedIn()) {
         window.location.href = '/index.html';
@@ -18,6 +20,7 @@ async function initializeDashboard() {
     // Display user info
     if (user) {
         displayUserInfo(user);
+        updateVerificationStatus(user);
     }
 
     // Fetch fresh user data
@@ -32,6 +35,7 @@ async function initializeDashboard() {
             freshUser
         );
         displayUserInfo(freshUser);
+        updateVerificationStatus(freshUser);
     } catch (error) {
         console.error('Error fetching user:', error);
         // Token might be invalid, redirect to login
@@ -98,6 +102,60 @@ function displayRecentActivity() {
       </div>
     </div>
   `).join('');
+}
+
+function updateVerificationStatus(user) {
+    const statusText = document.getElementById('verification-status-text');
+    const hint = document.getElementById('verification-hint');
+    const resendBtn = document.getElementById('resend-verification-btn');
+
+    if (!statusText || !hint || !resendBtn) {
+        return;
+    }
+
+    UIHelper.hideMessage('status-message');
+
+    if (user.email_verified) {
+        statusText.textContent = i18n.t('dashboard.statusVerified');
+        hint.textContent = i18n.t('dashboard.statusVerifiedDesc');
+        resendBtn.style.display = 'none';
+        resendBtn.disabled = false;
+    } else {
+        statusText.textContent = i18n.t('dashboard.statusUnverified');
+        hint.textContent = i18n.t('dashboard.statusUnverifiedDesc');
+        resendBtn.style.display = 'inline-flex';
+        resendBtn.disabled = false;
+
+        if (!dashboardResendBound) {
+            resendBtn.addEventListener('click', handleDashboardResendVerification);
+            dashboardResendBound = true;
+        }
+    }
+}
+
+async function handleDashboardResendVerification(e) {
+    e.preventDefault();
+
+    UIHelper.hideMessage('status-message');
+    UIHelper.showLoading('resend-verification-btn');
+
+    try {
+        await TokenManager.withFreshToken((accessToken) =>
+            apiClient.resendVerification(accessToken)
+        );
+
+        UIHelper.showMessage('status-message', i18n.t('msg.verificationResent'), false);
+    } catch (error) {
+        console.error('Resend verification error:', error);
+        if (error.status === 401) {
+            await TokenManager.logout();
+            window.location.href = '/index.html';
+            return;
+        }
+        UIHelper.showMessage('status-message', error.message || i18n.t('error.serverError'), true);
+    } finally {
+        UIHelper.hideLoading('resend-verification-btn');
+    }
 }
 
 async function handleLogout(e) {

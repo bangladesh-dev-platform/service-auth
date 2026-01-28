@@ -116,17 +116,20 @@ async function handleChangePassword(e) {
     UIHelper.showLoading('change-password-btn');
 
     try {
-        // TODO: Implement change password API endpoint
-        // await apiClient.changePassword(currentPassword, newPassword);
-
-        // Simulated success for now
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await TokenManager.withFreshToken((accessToken) =>
+            apiClient.changePassword(accessToken, {
+                current_password: currentPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword,
+            })
+        );
 
         UIHelper.showMessage('success-message', i18n.t('msg.passwordChanged'), false);
 
-        setTimeout(() => {
-            window.location.href = '/dashboard.html';
-        }, 2000);
+        setTimeout(async () => {
+            await TokenManager.logout();
+            window.location.href = '/index.html';
+        }, 1500);
 
     } catch (error) {
         console.error('Change password error:', error);
@@ -252,7 +255,15 @@ function initializeEmailVerificationPage() {
     }
 
     const resendBtn = document.getElementById('resend-btn');
-    resendBtn.addEventListener('click', handleResendVerification);
+    if (resendBtn) {
+        resendBtn.addEventListener('click', handleResendVerification);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+        verifyEmailToken(token);
+    }
 }
 
 async function handleResendVerification(e) {
@@ -263,19 +274,30 @@ async function handleResendVerification(e) {
     UIHelper.showLoading('resend-btn');
 
     try {
-        // TODO: Implement resend verification API endpoint
-        // await apiClient.resendVerification();
+        await TokenManager.withFreshToken((accessToken) =>
+            apiClient.resendVerification(accessToken)
+        );
 
-        // Simulated success for now
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        UIHelper.showMessage('success-message', i18n.t('msg.verificationSent'), false);
+        UIHelper.showMessage('success-message', i18n.t('msg.verificationResent'), false);
 
     } catch (error) {
         console.error('Resend verification error:', error);
         UIHelper.showMessage('error-message', error.message, true);
     } finally {
         UIHelper.hideLoading('resend-btn');
+    }
+}
+
+async function verifyEmailToken(token) {
+    UIHelper.hideMessage('error-message');
+    UIHelper.hideMessage('success-message');
+
+    try {
+        await apiClient.verifyEmail(token);
+        UIHelper.showMessage('success-message', i18n.t('msg.emailVerified'), false);
+    } catch (error) {
+        console.error('Email verification error:', error);
+        UIHelper.showMessage('error-message', error.message || i18n.t('error.verificationInvalid'), true);
     }
 }
 

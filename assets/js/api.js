@@ -72,6 +72,29 @@ class ApiClient {
     });
   }
 
+  async changePassword(token, payload) {
+    return this._request('/api/v1/auth/change-password', {
+      method: 'POST',
+      token,
+      body: payload
+    });
+  }
+
+  async resendVerification(token) {
+    return this._request('/api/v1/auth/resend-verification', {
+      method: 'POST',
+      token
+    });
+  }
+
+  async verifyEmail(token) {
+    return this._request('/api/v1/auth/verify-email', {
+      method: 'POST',
+      body: { token },
+      fallbackKey: 'error.verificationInvalid'
+    });
+  }
+
   async _request(path, { method = 'GET', token = null, body = null, fallbackKey = 'error.serverError' } = {}) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) {

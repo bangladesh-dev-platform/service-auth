@@ -154,6 +154,8 @@ const translations = {
         'msg.profileUpdated': 'Profile updated successfully',
         'msg.passwordChanged': 'Password changed successfully',
         'msg.verificationSent': 'Verification email sent successfully',
+        'msg.emailVerified': 'Email verified successfully',
+        'msg.verificationResent': 'Verification email sent again',
 
         // Error messages
         'error.invalidCredentials': 'Invalid email or password',
@@ -161,6 +163,8 @@ const translations = {
         'error.networkError': 'Connection failed. Please check your internet',
         'error.serverError': 'Something went wrong. Please try again',
         'error.invalidToken': 'Invalid or expired reset token',
+        'error.passwordIncorrect': 'Current password is incorrect',
+        'error.verificationInvalid': 'Invalid or expired verification token',
         'error.sessionExpired': 'Your session has expired. Please sign in again',
     },
 
@@ -298,6 +302,8 @@ const translations = {
         'msg.profileUpdated': 'প্রোফাইল সফলভাবে আপডেট হয়েছে',
         'msg.passwordChanged': 'পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে',
         'msg.verificationSent': 'যাচাইকরণ ইমেইল সফলভাবে পাঠানো হয়েছে',
+        'msg.emailVerified': 'ইমেইল সফলভাবে যাচাই হয়েছে',
+        'msg.verificationResent': 'যাচাইকরণ ইমেইল আবার পাঠানো হয়েছে',
 
         // Error messages
         'error.invalidCredentials': 'অবৈধ ইমেইল বা পাসওয়ার্ড',
@@ -305,6 +311,8 @@ const translations = {
         'error.networkError': 'সংযোগ ব্যর্থ। আপনার ইন্টারনেট চেক করুন',
         'error.serverError': 'কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন',
         'error.invalidToken': 'অবৈধ বা মেয়াদোত্তীর্ণ রিসেট টোকেন',
+        'error.passwordIncorrect': 'বর্তমান পাসওয়ার্ড সঠিক নয়',
+        'error.verificationInvalid': 'অবৈধ বা মেয়াদোত্তীর্ণ যাচাইকরণ টোকেন',
         'error.sessionExpired': 'আপনার সেশনের মেয়াদ শেষ। আবার সাইন ইন করুন',
     }
 };

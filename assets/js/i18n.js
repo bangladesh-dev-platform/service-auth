@@ -28,7 +28,13 @@ class I18n {
      * Get translation for a key
      */
     t(key) {
-        return this.translations[this.currentLanguage][key] || key;
+        const langPack = this.translations[this.currentLanguage] || {};
+        if (langPack[key]) {
+            return langPack[key];
+        }
+
+        const fallback = this.translations['en'] || {};
+        return fallback[key] || key;
     }
 
     /**

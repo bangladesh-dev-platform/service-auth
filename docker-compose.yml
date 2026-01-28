@@ -1,0 +1,24 @@
+services:
+  service_auth:
+    image: nginx:stable-alpine
+    container_name: service-auth
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authsrv.rule=Host(`auth.banglade.sh`)"
+      - "traefik.http.routers.authsrv.entrypoints=websecure"
+      - "traefik.http.routers.authsrv.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.authsrv-http.rule=Host(`auth.banglade.sh`)"
+      - "traefik.http.routers.authsrv-http.entrypoints=web"
+      - "traefik.http.routers.authsrv-http.middlewares=https-redirect"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+
+networks:
+  traefik:
+    external: true

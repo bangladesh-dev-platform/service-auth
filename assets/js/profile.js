@@ -202,11 +202,30 @@ async function handleEditProfile(e) {
     UIHelper.hideMessage('error-message');
     UIHelper.hideMessage('success-message');
 
+    const currentUser = TokenManager.getUser();
     const updates = {
         first_name: document.getElementById('first-name').value.trim(),
         last_name: document.getElementById('last-name').value.trim(),
         phone: document.getElementById('phone').value.trim(),
+        email: document.getElementById('email').value.trim(),
     };
+
+    let hasError = false;
+
+    if (!updates.email) {
+        FormValidator.showError('email', i18n.t('validation.emailRequired'));
+        hasError = true;
+    } else if (!FormValidator.validateEmail(updates.email)) {
+        FormValidator.showError('email', i18n.t('validation.emailInvalid'));
+        hasError = true;
+    } else {
+        FormValidator.clearError('email');
+    }
+
+    if (hasError) {
+        UIHelper.shakeForm('edit-profile-form');
+        return;
+    }
 
     UIHelper.showLoading('save-profile-btn');
 
@@ -222,7 +241,13 @@ async function handleEditProfile(e) {
             updatedUser
         );
 
-        UIHelper.showMessage('success-message', i18n.t('msg.profileUpdated'), false);
+        const previousEmail = currentUser?.email || '';
+        const emailChanged = previousEmail.toLowerCase() !== updates.email.toLowerCase();
+        const message = emailChanged
+            ? `${i18n.t('msg.profileUpdated')} ${i18n.t('msg.verificationSent')}`
+            : i18n.t('msg.profileUpdated');
+
+        UIHelper.showMessage('success-message', message, false);
 
         setTimeout(() => {
             window.location.href = '/dashboard.html';

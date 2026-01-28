@@ -168,8 +168,15 @@ async function loadUserDataIntoForm() {
 
     // Also fetch fresh data
     try {
-        const token = TokenManager.getAccessToken();
-        const freshUser = await apiClient.getCurrentUser(token);
+        const freshUser = await TokenManager.withFreshToken((accessToken) =>
+            apiClient.getCurrentUser(accessToken)
+        );
+
+        TokenManager.saveTokens(
+            TokenManager.getAccessToken(),
+            TokenManager.getRefreshToken(),
+            freshUser
+        );
 
         document.getElementById('first-name').value = freshUser.first_name || '';
         document.getElementById('last-name').value = freshUser.last_name || '';
@@ -177,6 +184,11 @@ async function loadUserDataIntoForm() {
         document.getElementById('phone').value = freshUser.phone || '';
     } catch (error) {
         console.error('Error loading user data:', error);
+        if (error.status === 401) {
+            await TokenManager.logout();
+            window.location.href = '/index.html';
+            return;
+        }
     }
 }
 
@@ -196,11 +208,16 @@ async function handleEditProfile(e) {
     UIHelper.showLoading('save-profile-btn');
 
     try {
-        const token = TokenManager.getAccessToken();
-        const updatedUser = await apiClient.updateProfile(token, updates);
+        const updatedUser = await TokenManager.withFreshToken((accessToken) =>
+            apiClient.updateProfile(accessToken, updates)
+        );
 
         // Update local storage
-        TokenManager.saveTokens(token, TokenManager.getRefreshToken(), updatedUser);
+        TokenManager.saveTokens(
+            TokenManager.getAccessToken(),
+            TokenManager.getRefreshToken(),
+            updatedUser
+        );
 
         UIHelper.showMessage('success-message', i18n.t('msg.profileUpdated'), false);
 
@@ -210,6 +227,11 @@ async function handleEditProfile(e) {
 
     } catch (error) {
         console.error('Update profile error:', error);
+        if (error.status === 401) {
+            await TokenManager.logout();
+            window.location.href = '/index.html';
+            return;
+        }
         UIHelper.showMessage('error-message', error.message, true);
         UIHelper.shakeForm('edit-profile-form');
     } finally {

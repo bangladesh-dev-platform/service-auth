@@ -161,6 +161,7 @@ const translations = {
         'error.networkError': 'Connection failed. Please check your internet',
         'error.serverError': 'Something went wrong. Please try again',
         'error.invalidToken': 'Invalid or expired reset token',
+        'error.sessionExpired': 'Your session has expired. Please sign in again',
     },
 
     bn: {
@@ -304,6 +305,7 @@ const translations = {
         'error.networkError': 'সংযোগ ব্যর্থ। আপনার ইন্টারনেট চেক করুন',
         'error.serverError': 'কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন',
         'error.invalidToken': 'অবৈধ বা মেয়াদোত্তীর্ণ রিসেট টোকেন',
+        'error.sessionExpired': 'আপনার সেশনের মেয়াদ শেষ। আবার সাইন ইন করুন',
     }
 };
 

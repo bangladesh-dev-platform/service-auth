@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initializeDashboard() {
-    const token = TokenManager.getAccessToken();
     const user = TokenManager.getUser();
 
     // Display user info
@@ -23,14 +22,23 @@ async function initializeDashboard() {
 
     // Fetch fresh user data
     try {
-        const freshUser = await apiClient.getCurrentUser(token);
-        TokenManager.saveTokens(token, TokenManager.getRefreshToken(), freshUser);
+        const freshUser = await TokenManager.withFreshToken((accessToken) =>
+            apiClient.getCurrentUser(accessToken)
+        );
+
+        TokenManager.saveTokens(
+            TokenManager.getAccessToken(),
+            TokenManager.getRefreshToken(),
+            freshUser
+        );
         displayUserInfo(freshUser);
     } catch (error) {
         console.error('Error fetching user:', error);
         // Token might be invalid, redirect to login
-        TokenManager.clearTokens();
-        window.location.href = '/index.html';
+        await TokenManager.logout();
+        UIHelper.showMessage('error-message', i18n.t('error.sessionExpired'), true);
+        setTimeout(() => window.location.href = '/index.html', 1500);
+        return;
     }
 
     // Setup logout button
@@ -92,11 +100,11 @@ function displayRecentActivity() {
   `).join('');
 }
 
-function handleLogout(e) {
+async function handleLogout(e) {
     e.preventDefault();
 
     if (confirm(i18n.currentLanguage === 'bn' ? 'আপনি কি লগআউট করতে চান?' : 'Are you sure you want to logout?')) {
-        TokenManager.clearTokens();
+        await TokenManager.logout();
         window.location.href = '/index.html';
     }
 }

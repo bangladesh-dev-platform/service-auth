@@ -56,9 +56,15 @@ async function handleForgotPassword(e) {
     UIHelper.showLoading('forgot-btn');
 
     try {
-        await apiClient.forgotPassword(email);
+        const response = await apiClient.forgotPassword(email);
 
-        UIHelper.showMessage('success-message', i18n.t('msg.resetLinkSent'), false);
+        let successMessage = i18n.t('msg.resetLinkSent');
+        if (response?.reset_token) {
+            const tokenLabel = i18n.currentLanguage === 'bn' ? 'টোকেন' : 'Token';
+            successMessage += ` (${tokenLabel}: ${response.reset_token})`;
+        }
+
+        UIHelper.showMessage('success-message', successMessage, false);
 
         // Clear form
         document.getElementById('email').value = '';
@@ -172,7 +178,7 @@ async function handleResetPassword(e) {
     UIHelper.showLoading('reset-btn');
 
     try {
-        await apiClient.resetPassword(token, newPassword);
+        await apiClient.resetPassword(token, newPassword, confirmPassword);
 
         UIHelper.showMessage('success-message', i18n.t('msg.passwordReset'), false);
 

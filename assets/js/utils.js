@@ -31,6 +31,49 @@ class TokenManager {
         localStorage.removeItem('user');
     }
 
+    static async refreshSession() {
+        const refreshToken = this.getRefreshToken();
+        if (!refreshToken) {
+            throw new Error(i18n.t('error.sessionExpired'));
+        }
+
+        const data = await apiClient.refreshToken(refreshToken);
+        this.saveTokens(data.access_token, data.refresh_token, data.user);
+        return data;
+    }
+
+    static async logout() {
+        const refreshToken = this.getRefreshToken();
+        try {
+            if (refreshToken) {
+                await apiClient.logout(refreshToken);
+            }
+        } catch (error) {
+            console.warn('Logout request failed:', error);
+        } finally {
+            this.clearTokens();
+        }
+    }
+
+    static async withFreshToken(callback) {
+        const execute = async () => await Promise.resolve(callback(this.getAccessToken()));
+
+        try {
+            return await execute();
+        } catch (error) {
+            if (error.status === 401 && this.getRefreshToken()) {
+                try {
+                    await this.refreshSession();
+                } catch (refreshError) {
+                    await this.logout();
+                    throw refreshError;
+                }
+                return await execute();
+            }
+            throw error;
+        }
+    }
+
     static isLoggedIn() {
         return !!this.getAccessToken();
     }

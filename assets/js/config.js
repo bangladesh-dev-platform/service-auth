@@ -13,8 +13,10 @@ const ALLOWED_REDIRECT_DOMAINS = [
     'files.banglade.sh',
     'comments.banglade.sh',
     'media.banglade.sh',
+    'youtube.banglade.sh',
     'localhost:3000',
     'localhost:3001',
+    'localhost:5173',
     'localhost:8080',
 ];
 

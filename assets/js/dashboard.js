@@ -115,7 +115,7 @@ function updateVerificationStatus(user) {
 
     UIHelper.hideMessage('status-message');
 
-    if (user.email_verified) {
+    if (user.email_verified || user.emailVerified) {
         statusText.textContent = i18n.t('dashboard.statusVerified');
         hint.textContent = i18n.t('dashboard.statusVerifiedDesc');
         resendBtn.style.display = 'none';

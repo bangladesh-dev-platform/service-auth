@@ -103,12 +103,18 @@ class RedirectHandler {
         }
     }
 
-    static performRedirect(token) {
+    static performRedirect(accessToken, refreshToken) {
         const redirectUrl = this.getRedirectUrl();
 
         if (redirectUrl && this.isValidRedirectUrl(redirectUrl)) {
-            const separator = redirectUrl.includes('?') ? '&' : '?';
-            window.location.href = `${redirectUrl}${separator}token=${token}`;
+            const url = new URL(redirectUrl, window.location.origin);
+            url.searchParams.set('token', accessToken);
+            if (refreshToken) {
+                url.searchParams.set('refresh_token', refreshToken);
+            } else {
+                url.searchParams.delete('refresh_token');
+            }
+            window.location.href = url.toString();
         } else {
             // No valid redirect URL, go to dashboard
             window.location.href = '/dashboard.html';

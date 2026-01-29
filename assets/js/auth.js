@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Redirect if already logged in
-    if (TokenManager.isLoggedIn() && !window.location.pathname.includes('dashboard')) {
+        if (TokenManager.isLoggedIn() && !window.location.pathname.includes('dashboard')) {
         const redirectUrl = RedirectHandler.getRedirectUrl();
         if (redirectUrl && RedirectHandler.isValidRedirectUrl(redirectUrl)) {
-            RedirectHandler.performRedirect(TokenManager.getAccessToken());
+            RedirectHandler.performRedirect(TokenManager.getAccessToken(), TokenManager.getRefreshToken());
         } else {
             window.location.href = '/dashboard.html';
         }
@@ -94,7 +94,7 @@ async function handleLogin(e) {
         UIHelper.showMessage('success-message', i18n.t('msg.loginSuccess'), false);
 
         setTimeout(() => {
-            RedirectHandler.performRedirect(response.access_token);
+            RedirectHandler.performRedirect(response.access_token, response.refresh_token);
         }, 1000);
 
     } catch (error) {
@@ -246,7 +246,7 @@ async function handleRegister(e) {
         UIHelper.showMessage('success-message', i18n.t('msg.registerSuccess'), false);
 
         setTimeout(() => {
-            RedirectHandler.performRedirect(loginResponse.access_token);
+            RedirectHandler.performRedirect(loginResponse.access_token, loginResponse.refresh_token);
         }, 1500);
 
     } catch (error) {

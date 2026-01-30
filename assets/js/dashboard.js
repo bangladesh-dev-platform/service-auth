@@ -6,13 +6,18 @@
 let dashboardResendBound = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!TokenManager.isLoggedIn()) {
+    bootstrapDashboard();
+});
+
+async function bootstrapDashboard() {
+    const hasSession = await TokenManager.ensureValidSession();
+    if (!hasSession) {
         window.location.href = '/index.html';
         return;
     }
 
     initializeDashboard();
-});
+}
 
 async function initializeDashboard() {
     const user = TokenManager.getUser();

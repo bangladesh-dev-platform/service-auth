@@ -15,16 +15,29 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeRegisterPage();
     }
 
-    // Redirect if already logged in
-        if (TokenManager.isLoggedIn() && !window.location.pathname.includes('dashboard')) {
-        const redirectUrl = RedirectHandler.getRedirectUrl();
-        if (redirectUrl && RedirectHandler.isValidRedirectUrl(redirectUrl)) {
-            RedirectHandler.performRedirect(TokenManager.getAccessToken(), TokenManager.getRefreshToken());
-        } else {
-            window.location.href = '/dashboard.html';
-        }
-    }
+    autoRedirectIfAuthenticated();
 });
+
+async function autoRedirectIfAuthenticated() {
+    if (window.location.pathname.includes('dashboard')) {
+        return;
+    }
+
+    const hasSession = await TokenManager.ensureValidSession();
+    if (!hasSession) {
+        return;
+    }
+
+    const redirectUrl = RedirectHandler.getRedirectUrl();
+    const accessToken = TokenManager.getAccessToken();
+    const refreshToken = TokenManager.getRefreshToken();
+
+    if (redirectUrl && RedirectHandler.isValidRedirectUrl(redirectUrl)) {
+        RedirectHandler.performRedirect(accessToken, refreshToken);
+    } else {
+        window.location.href = '/dashboard.html';
+    }
+}
 
 function initializeLoginPage() {
     const form = document.getElementById('login-form');

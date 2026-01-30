@@ -5,6 +5,8 @@
 /**
  * Token Manager
  */
+const TOKEN_EXPIRY_GRACE_SECONDS = 30;
+
 class TokenManager {
     static saveTokens(accessToken, refreshToken, user) {
         localStorage.setItem('access_token', accessToken);
@@ -75,7 +77,61 @@ class TokenManager {
     }
 
     static isLoggedIn() {
-        return !!this.getAccessToken();
+        const token = this.getAccessToken();
+        return Boolean(token && !this.isTokenExpired(token));
+    }
+
+    static decodeTokenPayload(token) {
+        try {
+            const parts = token.split('.');
+            if (parts.length < 2) {
+                return null;
+            }
+            const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+            const padded = base64.padEnd(base64.length + (4 - (base64.length % 4 || 4)) % 4, '=');
+            const json = atob(padded);
+            return JSON.parse(json);
+        } catch (error) {
+            console.warn('Unable to decode token payload', error);
+            return null;
+        }
+    }
+
+    static isTokenExpired(token) {
+        const payload = this.decodeTokenPayload(token);
+        if (!payload || !payload.exp) {
+            return false;
+        }
+
+        const now = Math.floor(Date.now() / 1000);
+        return payload.exp <= now + TOKEN_EXPIRY_GRACE_SECONDS;
+    }
+
+    static async ensureValidSession() {
+        const token = this.getAccessToken();
+        if (!token) {
+            this.clearTokens();
+            return false;
+        }
+
+        if (!this.isTokenExpired(token)) {
+            return true;
+        }
+
+        const refreshToken = this.getRefreshToken();
+        if (!refreshToken) {
+            this.clearTokens();
+            return false;
+        }
+
+        try {
+            await this.refreshSession();
+            return true;
+        } catch (error) {
+            console.warn('Failed to refresh session', error);
+            await this.logout();
+            return false;
+        }
     }
 }
 

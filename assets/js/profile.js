@@ -4,9 +4,23 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    initializeProfileModules();
+});
+
+async function initializeProfileModules() {
     const changePasswordForm = document.getElementById('change-password-form');
     const editProfileForm = document.getElementById('edit-profile-form');
     const resendBtn = document.getElementById('resend-btn');
+
+    const requiresAuth = Boolean(changePasswordForm || editProfileForm || resendBtn);
+
+    if (requiresAuth) {
+        const hasSession = await TokenManager.ensureValidSession();
+        if (!hasSession) {
+            window.location.href = '/index.html';
+            return;
+        }
+    }
 
     if (changePasswordForm) {
         initializeChangePasswordPage();
@@ -19,19 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resendBtn) {
         initializeEmailVerificationPage();
     }
-});
+}
 
 // ============================================
 // CHANGE PASSWORD
 // ============================================
 
 function initializeChangePasswordPage() {
-    // Check if logged in
-    if (!TokenManager.isLoggedIn()) {
-        window.location.href = '/index.html';
-        return;
-    }
-
     const form = document.getElementById('change-password-form');
     const currentPwdInput = document.getElementById('current-password');
     const newPwdInput = document.getElementById('new-password');
@@ -145,12 +153,6 @@ async function handleChangePassword(e) {
 // ============================================
 
 function initializeEditProfilePage() {
-    // Check if logged in
-    if (!TokenManager.isLoggedIn()) {
-        window.location.href = '/index.html';
-        return;
-    }
-
     const form = document.getElementById('edit-profile-form');
 
     // Load current user data

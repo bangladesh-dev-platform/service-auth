@@ -8,16 +8,10 @@ const API_BASE_URL = 'https://api.banglade.sh';
 // For development: const API_BASE_URL = 'http://localhost:8080';
 
 // Allowed redirect domains (whitelist for SSO)
+// Use 'banglade.sh' to allow all subdomains (*.banglade.sh)
 const ALLOWED_REDIRECT_DOMAINS = [
-    'posts.banglade.sh',
-    'files.banglade.sh',
-    'comments.banglade.sh',
-    'media.banglade.sh',
-    'youtube.banglade.sh',
-    'localhost:3000',
-    'localhost:3001',
-    'localhost:5173',
-    'localhost:8080',
+    'banglade.sh',
+    'localhost',
 ];
 
 // Language translations
